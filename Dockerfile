@@ -29,6 +29,22 @@ RUN \
     && apt-get install -y -q supervisor openssh-server \
     && mkdir -p /var/run/sshd \
     && apt-get clean
+    
+#python3
+RUN apt-get update && \
+        apt-get install -y python3 python3-dev python-distribute python3-pip && \
+        apt-get install -y libcurl4-openssl-dev libxml2-dev libxslt1-dev python3-lxml python-mysqldb libpq-dev && \
+        apt-get install -y libmysqlclient-dev \
+        && apt-get clean
+        
+RUN pip3 install tldextract mysqlclient celery
+
+# Output supervisor config file to manage supervisor webui
+RUN echo "[inet_http_server]" >> /etc/supervisor/conf.d/supervisord.conf
+RUN echo "port=9001" >> /etc/supervisor/conf.d/supervisord.conf
+RUN echo "username = admin" >> /etc/supervisor/conf.d/supervisord.conf
+RUN echo "password = q452322993" >> /etc/supervisor/conf.d/supervisord.conf
+
 
 # Output supervisor config file to start openssh-server
 RUN echo "[program:openssh-server]" >> /etc/supervisor/conf.d/supervisord-openssh-server.conf
@@ -54,6 +70,7 @@ RUN \
 
 VOLUME [ "/var/log/mysql/", "/var/log/apache2/" ]
 
+EXPOSE 9001
 EXPOSE 3306
 EXPOSE 2222
 EXPOSE 80
